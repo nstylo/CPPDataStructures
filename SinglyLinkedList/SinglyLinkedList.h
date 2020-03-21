@@ -8,12 +8,9 @@ namespace datastructs {
 
         public:
 
-            // constructors destructors
-            list_node () = delete;
+            // constructors, destructors
+            list_node ();
             list_node<T> (const T&, list_node<T>*);
-            explicit list_node (const list_node<T>&);
-            explicit list_node (list_node<T>&&);
-            ~list_node ();
 
             // accessors
             list_node<T>* next(void) const;
@@ -42,21 +39,25 @@ namespace datastructs {
             unsigned int get_size(void) const;
             list_node<T>* get_head(void) const;
             list_node<T>* get_tail(void) const;
+            T get_front(void) const;
+            T get_back(void) const;
+            unsigned int count(const T&) const;
 
             // mutators
+            void swap(singly_linked_list<T>);
             void push_front(const T&);
-            void push_front(T&&); // uses std::move
+            void push_front(T&&);
             void push_back(const T&);
-            void push_back(T&&); // uses std::move
-            T pop(void);
-            void destroy(void);
+            void push_back(T&&);
+            T& pop(void);
             unsigned int erase(const T&);
-            unsigned int erase(T&&); // uses std::move
+            unsigned int erase(T&&);
 
         private:
 
-            list_node<T>* head;
-            list_node<T>* tail;
+            void insert_front(T& t);
+            void insert_back(T& t);
+            list_node<T> *head, *tail;
             unsigned int size;
 
     };
