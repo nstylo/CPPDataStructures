@@ -1,7 +1,6 @@
 #include "SinglyLinkedList.h"
 #include <stdexcept>
 #include <utility>
-#include <iostream>
 
 using namespace datastructs;
 
@@ -9,19 +8,9 @@ template<typename T>
 list_node<T>::list_node () {}
 
 template<typename T>
-list_node<T>::list_node (const T& t, list_node<T>* next)
-    : element(t), next_node(next)
+list_node<T>::list_node (T& t, list_node<T>* next)
+    : element(t), next(next)
 {}
-
-template<typename T>
-list_node<T>* list_node<T>::next(void) const {
-    return next_node;
-}
-
-template<typename T>
-T list_node<T>::retrieve(void) const {
-    return element;
-}
 
 template<typename T>
 singly_linked_list<T>::singly_linked_list () :
@@ -35,9 +24,16 @@ singly_linked_list<T>::~singly_linked_list () {
     list_node<T>* next = head;
     while (next) {
         list_node<T>* curr = next;
-        next = curr->next();
+        next = curr->next;
         delete curr;
     }
+}
+
+// uncommon behaviour: swaps the lists
+template<typename T>
+singly_linked_list<T>& singly_linked_list<T>::operator= (singly_linked_list<T>& other) {
+    swap(other);
+    return *this;
 }
 
 template<typename T>
@@ -46,26 +42,11 @@ bool singly_linked_list<T>::empty(void) const {
 }
 
 template<typename T>
-unsigned int singly_linked_list<T>::get_size(void) const {
-    return size;
-}
-
-template<typename T>
-list_node<T>* singly_linked_list<T>::get_head(void) const {
-    return head;
-}
-
-template<typename T>
-list_node<T>* singly_linked_list<T>::get_tail(void) const {
-    return tail;
-}
-
-template<typename T>
 T singly_linked_list<T>::get_front(void) const {
     if (empty())
         throw std::underflow_error ("List is empty, but get_front attempted.");
 
-    return head->retrieve();
+    return head->element;
 }
 
 template<typename T>
@@ -73,7 +54,7 @@ T singly_linked_list<T>::get_back(void) const {
     if (empty())
         throw std::underflow_error ("List is empty, but get_back attempted.");
 
-    return tail->retrieve();
+    return tail->element;
 }
 
 template <typename T>
@@ -82,26 +63,26 @@ unsigned int singly_linked_list<T>::count(const T& t) const {
     list_node<T>* curr = head;
 
     for (int i = 0; i < size; i++) {
-        if (curr->retrieve() == t) { // increment count
+        if (curr->element == t) { // increment count
             cnt++;
         }
-        curr = curr->next(); // next node
+        curr = curr->next; // next node
     }
 
     return cnt;
 }
 
 template<typename T>
-void singly_linked_list<T>::swap(singly_linked_list<T> other) {
+void singly_linked_list<T>::swap(singly_linked_list<T>& other) {
     // create temp members
-    list_node<T>* temp_head = std::move(other.get_head());
-    list_node<T>* temp_tail = std::move(other.get_tail());
-    unsigned int temp_size = std::move(other.get_size());
+    list_node<T>* temp_head = std::move(other.head);
+    list_node<T>* temp_tail = std::move(other.tail);
+    unsigned int temp_size = std::move(other.size);
 
     // assign this objects members to other
-    other.get_head() = std::move(head);
-    other.get_tail() = std::move(tail);
-    other.get_size() = std::move(size);
+    other.head = std::move(head);
+    other.tail = std::move(tail);
+    other.size = std::move(size);
 
     // assing temp members to this
     head = std::move(temp_head);
@@ -110,7 +91,7 @@ void singly_linked_list<T>::swap(singly_linked_list<T> other) {
 }
 
 template<typename T>
-void singly_linked_list<T>::push_front(const T& t) {
+void singly_linked_list<T>::push_front(T& t) {
     insert_front(t);
 }
 
@@ -120,7 +101,7 @@ void singly_linked_list<T>::push_front(T&& t) {
 }
 
 template<typename T>
-void singly_linked_list<T>::push_back(const T& t) {
+void singly_linked_list<T>::push_back(T& t) {
     insert_back(t);
 }
 
@@ -135,8 +116,8 @@ T& singly_linked_list<T>::pop(void) {
         throw std::underflow_error ("List is empty, but pop attempted.");
 
     // copy necessary data from head
-    T element = head->retrieve();
-    list_node<T>* next = head->next();
+    T element = head->element;
+    list_node<T>* next = head->next;
     delete head;
 
     // move head pointer one position back
@@ -153,34 +134,32 @@ T& singly_linked_list<T>::pop(void) {
 }
 
 template<typename T>
-unsigned int singly_linked_list<T>::erase(const T& t) {
-    if (empty()) { // if list empty, there are no nodes to delete
-        return 0;
-    }
-
+template<typename U>
+unsigned int singly_linked_list<T>::erase(U&& u) {
     unsigned int cnt = 0;
     list_node<T>* prev = nullptr;
-    list_node<T>* curr = head; // head is guranteed to not be nullptr
+    list_node<T>* curr = head;
 
     for (int i = 0; i < size; i++) {
-        if (curr->retrieve() == t) { // delete, increment cnt and update head/tail
-            list_node<T>* temp = std::move(curr);
-            curr = curr->next();
+        if (curr->element == std::forward<U>(u)) { // delete, increment cnt and update head/tail
+            list_node<T>* temp = curr;
+            curr = curr->next;
 
-            if (!prev) { // we need to delete head
+            if (prev != nullptr) { // we need to reset head
                 head = curr;
-            } else if (!curr) { // we need to delete tail
+            }
+            if (curr != nullptr) { // we need to reset tail
                 tail = prev;
-            } else {
-                list_node<T>* ptr = prev->next();
-                ptr = curr;
+            } else { // pointer deleted, reset next
+                prev->next = curr;
             }
 
             cnt++;
             delete temp;
             continue;
         }
-        curr = curr->next(); // next node
+        prev = curr;
+        curr = curr->next; // next node
     }
 
     size -= cnt; // update size
@@ -190,15 +169,15 @@ unsigned int singly_linked_list<T>::erase(const T& t) {
 template<typename T>
 void singly_linked_list<T>::insert_back(T& t) {
     // create new node storing the passed on argument, pointing to current head
-    list_node<T>* new_node = new list_node<T> (std::move(t), nullptr);
+    list_node<T>* new_node = new list_node<T> (t, nullptr);
 
     // if list is empty, let head point to the new/first node
-    if (empty())
+    if (empty()) {
         head = new_node;
-
-    // update next of previous tail
-    list_node<T>* next = tail->next();
-    next = new_node;
+    } else {
+        // update next of previous tail
+        tail->next = new_node;
+    }
 
     // update tail
     tail = new_node;
@@ -209,7 +188,7 @@ void singly_linked_list<T>::insert_back(T& t) {
 template<typename T>
 void singly_linked_list<T>::insert_front(T& t) {
     // create new node storing the passed on argument, pointing to current head
-    list_node<T>* new_node = new list_node<T> (std::move(t), head);
+    list_node<T>* new_node = new list_node<T> (t, head);
 
     // if list is empty, let tail point to the new/first node
     if (empty())
@@ -219,21 +198,4 @@ void singly_linked_list<T>::insert_front(T& t) {
     head = new_node;
     // update size
     size++;
-}
-
-int main(int argc, char *argv[])
-{
-    singly_linked_list<int>* li = new singly_linked_list<int>();
-    li->push_front(1);
-    li->push_front(1);
-    li->push_front(1);
-
-    std::cout << li->get_size() << std::endl;
-    int i = 1;
-    li->erase(i);
-    std::cout << li->get_size() << std::endl;
-
-    delete li;
-
-    return 0;
 }
