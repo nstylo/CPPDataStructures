@@ -11,12 +11,13 @@ namespace datastructs {
 
             // constructors, destructors
             list_node ();
-            list_node<T> (T&, list_node<T>*);
+            list_node<T> (const T&, list_node<T>*);
+            list_node<T> (T&&, list_node<T>*);
 
     };
 
     template<typename T>
-    class singly_linked_list {
+    class list {
 
         public:
             // public members
@@ -24,13 +25,13 @@ namespace datastructs {
             unsigned int size;
 
             // constructors, destructors
-            singly_linked_list ();
-            explicit singly_linked_list (const singly_linked_list<T>&);
-            explicit singly_linked_list (singly_linked_list<T>&&);
-            ~singly_linked_list ();
+            list ();
+            explicit list (const list<T>&);
+            explicit list (list<T>&&);
+            ~list ();
 
             // operators
-            singly_linked_list<T>& operator= (singly_linked_list<T>&);
+            list<T>& operator= (list<T>&);
 
             // accessors
             bool empty(void) const;
@@ -39,20 +40,23 @@ namespace datastructs {
             unsigned int count(const T&) const;
 
             // mutators
-            void swap(singly_linked_list<T>&);
-            void push_front(T&);
+            void swap(list<T>&);
+            void push_front(const T&);
             void push_front(T&&);
-            void push_back(T&);
+            void push_back(const T&);
             void push_back(T&&);
+            unsigned int erase(const T&);
+            unsigned int erase(T&&);
             T& pop(void);
-
-            template<typename U>
-            unsigned int erase(U&&);
 
         private:
 
-            void insert_front(T& t);
-            void insert_back(T& t);
+            template<typename U>
+            unsigned int delete_node(U&&);
+            template<typename U>
+            void insert_front(U&& u);
+            template<typename U>
+            void insert_back(U&& u);
 
     };
 
