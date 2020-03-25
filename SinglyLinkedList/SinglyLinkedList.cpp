@@ -126,7 +126,7 @@ unsigned int list<T>::erase(T&& t) {
 }
 
 template<typename T>
-T& list<T>::pop(void) {
+T list<T>::pop(void) {
     if (empty())
         throw std::underflow_error ("List is empty, but pop attempted.");
 
@@ -156,7 +156,7 @@ unsigned int list<T>::delete_node(U&& u) {
     list_node<T>* curr = head;
 
     for (int i = 0; i < size; i++) {
-        if (curr->element == std::forward<U>(u)) { // delete, increment cnt and update head/tail
+        if (curr->element == u) { // delete, increment cnt and update head/tail
             list_node<T>* temp = curr;
             curr = curr->next;
 

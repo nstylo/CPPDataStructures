@@ -47,7 +47,7 @@ namespace datastructs {
             void push_back(T&&);
             unsigned int erase(const T&);
             unsigned int erase(T&&);
-            T& pop(void);
+            T pop(void);
 
         private:
 
