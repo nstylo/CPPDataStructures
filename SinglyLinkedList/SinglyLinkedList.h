@@ -1,6 +1,7 @@
 #pragma once
+#include <bits/c++config.h>
 
-namespace datastructs {
+namespace ds {
 
     template<typename T>
     struct list_node {
@@ -11,8 +12,13 @@ namespace datastructs {
 
             // constructors, destructors
             list_node ();
-            list_node<T> (const T&, list_node<T>*);
-            list_node<T> (T&&, list_node<T>*);
+            list_node (const T&, list_node<T>*);
+            list_node (T&&, list_node<T>*);
+
+            void swap(list_node<T>&);
+
+            // operator overloading
+            list_node& operator= (list_node<T>);
 
     };
 
@@ -22,7 +28,7 @@ namespace datastructs {
         public:
             // public members
             list_node<T> *head, *tail;
-            unsigned int size;
+            std::size_t size;
 
             // constructors, destructors
             list ();
@@ -30,8 +36,8 @@ namespace datastructs {
             explicit list (list<T>&&);
             ~list ();
 
-            // operators
-            list<T>& operator= (list<T>&);
+            // operator overloading
+            list<T>& operator= (list<T>);
 
             // accessors
             bool empty(void) const;

@@ -1,8 +1,9 @@
 #include "SinglyLinkedList.h"
+#include <bits/c++config.h>
 #include <stdexcept>
 #include <utility>
 
-using namespace datastructs;
+using namespace ds;
 
 template<typename T>
 list_node<T>::list_node () {}
@@ -18,10 +19,45 @@ list_node<T>::list_node (T&& t, list_node<T>* next)
 {}
 
 template<typename T>
+list_node<T>& list_node<T>::operator= (list_node<T> rhs) {
+    swap(rhs);
+    return *this;
+}
+
+template<typename T>
+void list_node<T>::swap (list_node<T>& other) {
+    // create temp members
+    T temp_element = std::move(other.element);
+    list_node<T>* temp_next = std::move(other.next);
+
+    // assing this objects members to other
+    other.element = std::move(element);
+    other.next = std::move(next);
+
+    // assign temp to members to this
+    element = std::move(temp_element);
+    next = std::move(temp_next);
+}
+
+template<typename T>
 list<T>::list () :
     head(nullptr),
     tail(nullptr),
     size(0)
+{}
+
+template<typename T>
+list<T>::list (const list<T>& t) :
+    head(t.head),
+    tail(t.tail),
+    size(t.size)
+{}
+
+template<typename T>
+list<T>::list (list<T>&& t) :
+    head(std::move(t.head)),
+    tail(std::move(t.tail)),
+    size(std::move(t.size))
 {}
 
 template<typename T>
@@ -34,10 +70,9 @@ list<T>::~list () {
     }
 }
 
-// uncommon behaviour: swaps the lists
 template<typename T>
-list<T>& list<T>::operator= (list<T>& other) {
-    swap(other);
+list<T>& list<T>::operator= (list<T> rhs) {
+    swap(rhs);
     return *this;
 }
 
@@ -82,14 +117,14 @@ void list<T>::swap(list<T>& other) {
     // create temp members
     list_node<T>* temp_head = std::move(other.head);
     list_node<T>* temp_tail = std::move(other.tail);
-    unsigned int temp_size = std::move(other.size);
+    std::size_t temp_size = std::move(other.size);
 
     // assign this objects members to other
     other.head = std::move(head);
     other.tail = std::move(tail);
     other.size = std::move(size);
 
-    // assing temp members to this
+    // assign temp members to this
     head = std::move(temp_head);
     tail = std::move(temp_tail);
     size = std::move(temp_size);
