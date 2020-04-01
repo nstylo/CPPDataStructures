@@ -1,6 +1,6 @@
 #include "SinglyLinkedList.h"
-#include <bits/c++config.h>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 using namespace ds;
@@ -25,7 +25,7 @@ list_node<T>& list_node<T>::operator= (list_node<T> rhs) {
 }
 
 template<typename T>
-void list_node<T>::swap (list_node<T>& other) {
+void list_node<T>::swap (list_node<T>& other) noexcept {
     // create temp members
     T temp_element = std::move(other.element);
     list_node<T>* temp_next = std::move(other.next);
@@ -77,7 +77,7 @@ list<T>& list<T>::operator= (list<T> rhs) {
 }
 
 template<typename T>
-bool list<T>::empty(void) const {
+bool list<T>::empty(void) const noexcept{
     return size == 0;
 }
 
@@ -98,7 +98,7 @@ T list<T>::get_back(void) const {
 }
 
 template <typename T>
-unsigned int list<T>::count(const T& t) const {
+unsigned int list<T>::count(const T& t) const noexcept {
     unsigned int cnt = 0;
     list_node<T>* curr = head;
 
@@ -113,7 +113,7 @@ unsigned int list<T>::count(const T& t) const {
 }
 
 template<typename T>
-void list<T>::swap(list<T>& other) {
+void list<T>::swap(list<T>& other) noexcept {
     // create temp members
     list_node<T>* temp_head = std::move(other.head);
     list_node<T>* temp_tail = std::move(other.tail);
@@ -131,32 +131,32 @@ void list<T>::swap(list<T>& other) {
 }
 
 template<typename T>
-void list<T>::push_front(const T& t) {
+void list<T>::push_front(const T& t) noexcept {
     insert_front(t);
 }
 
 template<typename T>
-void list<T>::push_front(T&& t) {
+void list<T>::push_front(T&& t) noexcept {
     insert_front(std::move(t));
 }
 
 template<typename T>
-void list<T>::push_back(const T& t) {
+void list<T>::push_back(const T& t) noexcept {
     insert_back(t);
 }
 
 template<typename T>
-void list<T>::push_back(T&& t) {
+void list<T>::push_back(T&& t) noexcept {
     insert_back(std::move(t));
 }
 
 template<typename T>
-unsigned int list<T>::erase(const T& t) {
+unsigned int list<T>::erase(const T& t) noexcept {
     return delete_node(t);
 }
 
 template<typename T>
-unsigned int list<T>::erase(T&& t) {
+unsigned int list<T>::erase(T&& t) noexcept {
     return delete_node(std::move(t));
 }
 
@@ -185,7 +185,9 @@ T list<T>::pop(void) {
 
 template<typename T>
 template<typename U>
-unsigned int list<T>::delete_node(U&& u) {
+unsigned int list<T>::delete_node(U&& u) noexcept {
+    static_assert(std::is_same<strippedType<T>, strippedType<U>>::value, "Types do not match");
+
     unsigned int cnt = 0;
     list_node<T>* prev = nullptr;
     list_node<T>* curr = head;
@@ -218,7 +220,9 @@ unsigned int list<T>::delete_node(U&& u) {
 
 template<typename T>
 template<typename U>
-void list<T>::insert_back(U&& u) {
+void list<T>::insert_back(U&& u) noexcept {
+    static_assert(std::is_same<strippedType<T>, strippedType<U>>::value, "Types do not match");
+
     // create new node storing the passed on argument, pointing to current head
     list_node<T>* new_node = new list_node<T> (std::forward<U>(u), nullptr);
 
@@ -238,7 +242,9 @@ void list<T>::insert_back(U&& u) {
 
 template<typename T>
 template<typename U>
-void list<T>::insert_front(U&& u) {
+void list<T>::insert_front(U&& u) noexcept {
+    static_assert(std::is_same<strippedType<T>, strippedType<U>>::value, "Types do not match");
+
     // create new node storing the passed on argument, pointing to current head
     list_node<T>* new_node = new list_node<T> (std::forward<U>(u), head);
 
@@ -250,4 +256,3 @@ void list<T>::insert_front(U&& u) {
     head = new_node;
     // update size
     size++;
-}
